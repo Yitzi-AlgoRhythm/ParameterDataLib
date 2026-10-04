@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using ParameterDataLib.Enums;
 
 namespace ParameterDataLib
 {
@@ -7,11 +8,9 @@ namespace ParameterDataLib
     {
         public required string Name { get; init; }
 
-        public required DataType Type { get; init; }
-
         public required TelemetryUnit Units { get; init; }
 
-        public required ValueBase Value {  get; init; }
+        public required double Value {  get; init; }
 
         public required double TimestampMS { get; init; }
     }

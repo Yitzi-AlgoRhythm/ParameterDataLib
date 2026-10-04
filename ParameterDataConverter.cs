@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using ParameterDataLib.Enums;
 
 namespace ParameterDataLib
 {
@@ -11,10 +12,8 @@ namespace ParameterDataLib
         public override ParameterData Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             string name = "";
-            DataType type = DataType.Type;
-            string typeStr = "";
             TelemetryUnit unit = TelemetryUnit.Unit;
-            ValueBase value = new IntValue(0);
+            double value = 0;
             double timestamp = 0;
 
             while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
@@ -28,25 +27,6 @@ namespace ParameterDataLib
                     case "name":
 
                         name = reader.GetString() ?? throw new JsonException("Expected 'name' to be a non-null string but got null.");
-
-                        break;
-
-                    case "type":
-
-                        typeStr = reader.GetString() ?? throw new JsonException("Expected 'type' to be a non-null string but got null.");
-
-                        if (typeStr == "double")
-                        {
-                            type = DataType.Double;
-                        }
-                        else if (typeStr == "int")
-                        {
-                            type = DataType.Int;
-                        }
-                        else
-                        {
-                            throw new ArgumentException("JSON object's type property was invalid");
-                        }
 
                         break;
 
@@ -113,14 +93,7 @@ namespace ParameterDataLib
 
                     case "value":
 
-                        if (type == DataType.Double)
-                        {
-                            value = new DoubleValue(reader.GetDouble());
-                        }
-                        else if (type == DataType.Int)
-                        {
-                            value = new IntValue(reader.GetInt32());
-                        }
+                        value = reader.GetDouble();
 
                         break;
 
@@ -135,7 +108,6 @@ namespace ParameterDataLib
             return new ParameterData()
             {
                 Name = name,
-                Type = type,
                 Units = unit,
                 Value = value,
                 TimestampMS = timestamp
@@ -147,15 +119,6 @@ namespace ParameterDataLib
             writer.WriteStartObject();
 
             writer.WriteString("name", data.Name);
-
-            if (data.Type == DataType.Double)
-            {
-                writer.WriteString("type", "double");
-            }
-            else
-            {
-                writer.WriteString("type", "int");
-            }
 
             writer.WriteString("units", data.Units switch
             {
@@ -181,16 +144,11 @@ namespace ParameterDataLib
                 _ => throw new JsonException($"Unexpected TelemetryUnit value: {data.Units}")
             });
 
-            if (data.Type == DataType.Double)
-            {
-                writer.WriteNumber("value", (data.Value as DoubleValue)!.Val);
-            }
-            else
-            {
-                writer.WriteNumber("value", (data.Value as IntValue)!.Val);
-            }
+            writer.WriteNumber("value", data.Value);
 
             writer.WriteNumber("timestamp", data.TimestampMS);
+
+            writer.WriteEndObject();
         }
     }
 }
