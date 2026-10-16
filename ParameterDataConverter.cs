@@ -14,7 +14,7 @@ namespace ParameterDataLib
             string name = "";
             TelemetryUnit unit = TelemetryUnit.Unit;
             double value = 0;
-            double timestamp = 0;
+            ulong timestamp = 0;
 
             while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
             {
@@ -99,7 +99,7 @@ namespace ParameterDataLib
 
                     case "timestamp":
 
-                        timestamp = reader.GetDouble();
+                        timestamp = reader.GetUInt64();
 
                         break;
                 }

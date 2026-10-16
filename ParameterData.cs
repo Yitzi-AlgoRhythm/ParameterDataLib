@@ -12,6 +12,6 @@ namespace ParameterDataLib
 
         public required double Value {  get; init; }
 
-        public required double TimestampMS { get; init; }
+        public required ulong TimestampMS { get; init; }
     }
 }
